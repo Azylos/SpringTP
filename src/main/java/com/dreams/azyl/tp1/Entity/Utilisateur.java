@@ -18,7 +18,8 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String pseudo;
-    private Boolean inscrit;
+    @Column(nullable = false)
+    private boolean inscrit;
 
     public Set<Tache> getTaches() {
         return taches;
@@ -53,11 +54,11 @@ public class Utilisateur {
         this.pseudo = pseudo;
     }
 
-    public Boolean getInscrit() {
+    public Boolean isInscrit() {
         return inscrit;
     }
 
-    public void setInscrit(Boolean inscrit) {
+    public void setInscrit(boolean inscrit) {
         this.inscrit = inscrit;
     }
 

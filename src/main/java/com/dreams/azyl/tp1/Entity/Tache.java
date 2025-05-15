@@ -3,6 +3,7 @@ package com.dreams.azyl.tp1.Entity;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class Tache {
 
     @ManyToOne
     @JoinColumn(name = "utilisateur_id")
+    @NotNull(message = "L'utilisateur est obligatoire")
     private Utilisateur utilisateur;
 
     @OneToMany(mappedBy = "tache")
