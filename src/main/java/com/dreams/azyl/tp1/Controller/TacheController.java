@@ -6,26 +6,23 @@ import com.dreams.azyl.tp1.Entity.Utilisateur;
 import com.dreams.azyl.tp1.Repository.ConsultationTacheRepository;
 import com.dreams.azyl.tp1.Repository.TacheRepository;
 import com.dreams.azyl.tp1.Repository.UtilisateurRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/taches")
 public class TacheController {
-    private final TacheRepository tacheRepository;
-    private final UtilisateurRepository utilisateurRepository;
-    private final ConsultationTacheRepository consultationTacheRepository;
-
-    public TacheController(TacheRepository tacheRepository, UtilisateurRepository utilisateurRepository, ConsultationTacheRepository consultationTacheRepository) {
-        this.tacheRepository = tacheRepository;
-        this.utilisateurRepository = utilisateurRepository;
-        this.consultationTacheRepository = consultationTacheRepository;
-    }
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private TacheRepository tacheRepository;
+    @Autowired
+    private ConsultationTacheRepository consultationTacheRepository;
 
     @PostMapping
     @RequestMapping("/creer")
@@ -50,12 +47,24 @@ public class TacheController {
         ConsultationTache consultation = new ConsultationTache(
                 inscrit,
                 savedTache,
-                1, // première vue
+                1,
                 LocalDateTime.now()
         );
 
         consultationTacheRepository.save(consultation);
 
         return ResponseEntity.ok(savedTache);
+    }
+
+    @GetMapping("/list/utilisateur/{id}")
+    public ResponseEntity<?> getTachesUtilisateur(@PathVariable Long id) {
+        Utilisateur utilisateur = utilisateurRepository.findById(id).orElse(null);
+        if (utilisateur == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Set<Tache> taches = utilisateur.getTaches().stream()
+                .filter(t -> "EN_COURS".equals(t.getStatut()) || "VALIDER".equals(t.getStatut()))
+                .collect(Collectors.toSet());
+        return ResponseEntity.ok(taches);
     }
 }
